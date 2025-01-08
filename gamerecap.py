@@ -15,11 +15,11 @@ def gamerecap(window, team):
 
     # sets the title of the
     # Toplevel widget
-    newWindow.title("New Window")
+    newWindow.title("Game Recap: BOS v BAL 04/07/24")
 
     # sets the geometry of toplevel
     newWindow.geometry("200x200")
 
     # A Label widget to show in toplevel
     Label(newWindow,
-          text="Boston vs Yo mama").pack()
+          text="Title").pack()
