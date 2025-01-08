@@ -1,55 +1,27 @@
-import pandas as pd
-import pybaseball
+import math
 from datetime import datetime
-import svglib
-from svglib.svglib import svg2rlg
+from PIL import ImageTk
 import tkinter as tk
 from tkinter import *
-from tkinter import messagebox
 from pybaseball import *
-from pybaseball.datasources.fangraphs import fg_batting_data
-
-import images
+from matchfunctions import get_teamabbr, teamabbr, abbrtoimg
+import tkinter as tk
+from datetime import datetime
+from tkinter import *
+from gamerecap import gamerecap
+from PIL import ImageTk
+from PIL import Image as IMG
+from pybaseball import *
 def format_name(plrname):
     last = plrname.split()[-1];
     if("Jr" in last):
         last = plrname.split()[-2]
     initials = "".join(filter(str.isupper, plrname))
     return initials[0] + ". " + last[:7];
+
+
 divs = ["AL East", "AL Central", "AL West", "NL East", "NL Central", "NL West"]
-teamabbr = {
-    "Orioles": "BAL",
-    "Red Sox": "BOS",
-    "Yankees": "NYY",
-    "Rays": "TBR",
-    "Blue Jays": "TOR",
-    "White Sox": "CHW",
-    "Guardians": "CLE",
-    "Indians": "CLE",
-    "Tigers": "DET",
-    "Royals": "KCR",
-    "Twins": "MIN",
-    "Astros": "HOU",
-    "Angels": "LAA",
-    "Athletics": "OAK",
-    "Mariners": "SEA",
-    "Rangers": "TEX",
-    "Braves": "ATL",
-    "Marlins": "MIA",
-    "Mets": "NYM",
-    "Phillies": "PHI",
-    "Nationals": "WSH",
-    "Cubs": "CHC",
-    "Reds": "CIN",
-    "Brewers": "MIL",
-    "Pirates": "PIT",
-    "Cardinals": "STL",
-    "Diamondbacks": "ARI",
-    "Rockies": "COL",
-    "Dodgers": "LAD",
-    "Padres": "SDP",
-    "Giants": "SFG"
-}
+
 y_cur = datetime.now().year
 m_cur = datetime.now().month;
 d_cur = datetime.now().day;
@@ -57,19 +29,21 @@ data = standings(2016)
 batstat = batting_stats(2016)[['Name', 'Team', 'AVG', 'H', 'HR', 'RBI', 'OPS', 'SB']]
 
 teamabbrlst = list(teamabbr.values())
+
+# Load batting stats for each division
 bsALE = batstat[batstat.Team.isin(teamabbrlst[0:5])].reset_index(drop=True)
-bsALC = batstat[batstat.Team.isin(teamabbrlst[5:11])].reset_index(drop=True)
-bsALW = batstat[batstat.Team.isin(teamabbrlst[11:16])].reset_index(drop=True)
-bsNLE = batstat[batstat.Team.isin(teamabbrlst[16:21])].reset_index(drop=True)
-bsNLC = batstat[batstat.Team.isin(teamabbrlst[21:26])].reset_index(drop=True)
-bsNLW = batstat[batstat.Team.isin(teamabbrlst[26:31])].reset_index(drop=True)
+bsALC = batstat[batstat.Team.isin(teamabbrlst[5:10] + teamabbrlst[30:30])].reset_index(drop=True)
+bsALW = batstat[batstat.Team.isin(teamabbrlst[10:15])].reset_index(drop=True)
+bsNLE = batstat[batstat.Team.isin(teamabbrlst[15:20])].reset_index(drop=True)
+bsNLC = batstat[batstat.Team.isin(teamabbrlst[20:25])].reset_index(drop=True)
+bsNLW = batstat[batstat.Team.isin(teamabbrlst[25:30])].reset_index(drop=True)
 print(bsALC)
 
 
 
 # leaderavg = batstat.iloc[batstat['AB'].max(), 0]
 #print(leaderavg)
-#pitstat = pitching_stats_bref(2024);
+#pitstat = pitching_stats_brespecdiv(2024);
 
 lstf = ""
 for i in range(len(data)):
@@ -78,9 +52,6 @@ for i in range(len(data)):
     else:
         lstf += [data[i].columns.values.tolist()] + [data[i].values.tolist()]
 
-
-
-
 window = tk.Tk()
 window.title("MLBToday")
 #getting screen width and height of display
@@ -88,18 +59,52 @@ width= window.winfo_screenwidth()
 height= window.winfo_screenheight()
 #setting tkinter window size
 window.geometry("%dx%d" % (width, height))
-photo = tk.PhotoImage(file="mlbToday/images/boslogo.png")
+photo = tk.PhotoImage(file="mlbToday/images/BOS.png")
 window.iconphoto(False, photo)
+thumbsize = (25,25)
+paths = ["mlbToday/images/BAL.png", "mlbToday/images/BOS.png"]
+
+def get_game_recap(team):
+    gamerecap(window, team);
+
+def getimageobject(i):
+    imgstring = "mlbToday/images/" + teamabbrlst[i] + ".png"
+
+    return newimg
+f = 0
+for i in range(30):
+    img = IMG.open(abbrtoimg[teamabbrlst[i]])
+    img.thumbnail(thumbsize);
+    newimg = ImageTk.PhotoImage(img)
+    piclabel = tk.Label(window, image=newimg)
+    piclabel.image = newimg
+    if i % 2 == 0:
+        piclabel.grid(row=21, column=math.floor(i / 2))
+    else:
+        piclabel.grid(row=22, column=math.floor(i / 2))
+gamelabel = tk.Label(window, text="04/07 5pm")
+gamelabel.grid(row = 20, column = 0)
+btn = Button(window, text ="View More", command = lambda: get_game_recap("BOS"));
+btn.grid(row = 20, column = 1)
+
+
+
+
+'''
+imgbos = IMG.open("mlbToday/images/BOS.png")
+
+imgbos.thumbnail(thumbsize);
+newbos = ImageTk.PhotoImage(imgbos)
+boslabel = tk.Label(window, image=newbos)
 # Title within window
 newLabel = tk.Label(window, image=photo)
+'''
+
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-def get_teamabbr(teamname):
-    for key in teamabbr:
-        if key in teamname:
-            return teamabbr[key];
-def f(x):
+
+def specdiv(x):
     return {
         0: bsALE,
         1: bsALC,
@@ -109,17 +114,19 @@ def f(x):
         5: bsNLW
     }
 def getLeaderStat(div, stat):
-    return(format_name(f(div).get(div, 0).iloc[f(div).get(div,0)[stat].idxmax(), 0])) + " " + str(f(div).get(div,0)[stat].max())
+    return(format_name(specdiv(div).get(div, 0).iloc[specdiv(div).get(div,0)[stat].idxmax(), 0])) + " " + str(specdiv(div).get(div,0)[stat].max())
 
 
 
 class Table:
         def __init__(self, root, iter):
                 self.d = Entry(root, width=10, fg='white', font=('Arial', 16, 'bold'), state="normal")
+                #Move NL Stuff to the right
                 if iter > 2:
                     rofs=3
                     cofs=10
                     self.d.config(readonlybackground='blue')
+                    #Make the headers
                     for i in range(4):
                         self.nlb = Entry(root, width=10, readonlybackground='blue', font=('Arial', 16, 'bold'), state="readonly")
                         self.nlb.grid(row=7*(iter-3), column=11+i)
