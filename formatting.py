@@ -20,10 +20,12 @@ def getdate():
 
 def utctoest(time):
     tlist = time.split(":");
-    if int(tlist[0]) > 12:
+    if int(tlist[0]) <= 5:
+        tlist[0] = str(24-(5-int(tlist[0])))
+    elif int(tlist[0]) > 12:
         tlist[0] = str(int(tlist[0])-5);
     else:
-        tlist[0] = str(int(tlist[0])-5)
+        tlist[0] = str(int(tlist[0])-5);
     newtime = tlist[0] + ":" + tlist[1];
     return newtime
 

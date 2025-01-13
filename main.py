@@ -131,7 +131,7 @@ for d in schedge:
 
 # for i in talni():
 
-print(MLB.schedule('2024-07-19'))
+print(MLB.schedule('2024-07-20'))
 '''
 imgbos = IMG.open("mlbToday/images/BOS.png")
 
