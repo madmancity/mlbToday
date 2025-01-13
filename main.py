@@ -1,34 +1,30 @@
 import math
 from datetime import datetime
+import statsapi as MLB
 from PIL import ImageTk
 import tkinter as tk
 from tkinter import *
 from pybaseball import *
 from matchfunctions import get_teamabbr, teamabbr, abbrtoimg
 import tkinter as tk
-from datetime import datetime
+from formatting import *
+from tkinter import ttk
 from tkinter import *
 from gamerecap import gamerecap
 from PIL import ImageTk
 from PIL import Image as IMG
 from pybaseball import *
-def format_name(plrname):
-    last = plrname.split()[-1];
-    if("Jr" in last):
-        last = plrname.split()[-2]
-    initials = "".join(filter(str.isupper, plrname))
-    return initials[0] + ". " + last[:7];
 
 
 divs = ["AL East", "AL Central", "AL West", "NL East", "NL Central", "NL West"]
 
-y_cur = datetime.now().year
-m_cur = datetime.now().month;
-d_cur = datetime.now().day;
-data = standings(2016)
-batstat = batting_stats(2016)[['Name', 'Team', 'AVG', 'H', 'HR', 'RBI', 'OPS', 'SB']]
+data = standings(2024)
+batstat = batting_stats(2024)[['Name', 'Team', 'AVG', 'H', 'HR', 'RBI', 'OPS', 'SB']]
 
 teamabbrlst = list(teamabbr.values())
+# talni stands for Team Abbreviation List (No Cleveland Indians)
+talni = teamabbrlst
+talni.pop();
 
 # Load batting stats for each division
 bsALE = batstat[batstat.Team.isin(teamabbrlst[0:5])].reset_index(drop=True)
@@ -63,33 +59,79 @@ photo = tk.PhotoImage(file="mlbToday/images/BOS.png")
 window.iconphoto(False, photo)
 thumbsize = (25,25)
 paths = ["mlbToday/images/BAL.png", "mlbToday/images/BOS.png"]
+standingsframe = ttk.Frame(window);
+gamesframe = ttk.Frame(window)
+standingsframe.grid(row=0, column=0, rowspan=19, columnspan=18)
+
 
 def get_game_recap(team):
     gamerecap(window, team);
 
-def getimageobject(i):
-    imgstring = "mlbToday/images/" + teamabbrlst[i] + ".png"
-
-    return newimg
+# def getimageobject(i):
+#     imgstring = "mlbToday/images/" + teamabbrlst[i] + ".png"
+#
+#     return newimg
 f = 0
-for i in range(30):
-    img = IMG.open(abbrtoimg[teamabbrlst[i]])
-    img.thumbnail(thumbsize);
-    newimg = ImageTk.PhotoImage(img)
-    piclabel = tk.Label(window, image=newimg)
-    piclabel.image = newimg
-    if i % 2 == 0:
-        piclabel.grid(row=21, column=math.floor(i / 2))
+g = 0
+schedge = MLB.schedule('2024-07-20');
+for d in schedge:
+    if f % 8 == 0 and f != 0:
+        g += 3;
+        f = 0;
+    time = utctoest(d['game_datetime'][11:19])
+    home = get_teamabbr(d['home_name'])
+    homeimg = IMG.open(abbrtoimg[home])
+    newhomeimg = ImageTk.PhotoImage(homeimg)
+    hpiclabel = tk.Label(window, image=newhomeimg, borderwidth=1, relief='ridge')
+    hpiclabel.image = newhomeimg
+    away = get_teamabbr(d['away_name'])
+    awayimg = IMG.open(abbrtoimg[away])
+    newawayimg = ImageTk.PhotoImage(awayimg)
+    apiclabel = tk.Label(window, image=newawayimg, borderwidth=1, relief='ridge')
+    apiclabel.image = newawayimg
+    if(d['series_status'] == None):
+        gamelabel = tk.Label(window, text=time + " | " + "SGS")
     else:
-        piclabel.grid(row=22, column=math.floor(i / 2))
-gamelabel = tk.Label(window, text="04/07 5pm")
-gamelabel.grid(row = 20, column = 0)
-btn = Button(window, text ="View More", command = lambda: get_game_recap("BOS"));
-btn.grid(row = 20, column = 1)
+        gamelabel = tk.Label(window, text=time + " | " + (d['series_status'][:3] + " " + d['series_status'][-3::]));
+    btn = Button(window, text="More..", command=lambda: get_game_recap(d['game_id']))
+    hscorelabel = tk.Label(window, text=d['home_score'])
+    ascorelabel = tk.Label(window, text=d['away_score'])
+    gamelabel.grid(row=20+g, column = f*2)
+    hpiclabel.grid(row=21+g, column = f*2)
+    apiclabel.grid(row=22+g, column = f*2)
+    btn.grid(row=20+g, column=(f*2) + 1)
+    hscorelabel.grid(row=21+g, column = (f*2)+1)
+    ascorelabel.grid(row=22+g, column = (f*2)+1)
+    f+=1;
 
 
 
 
+
+
+
+# for i in range(30):
+#     img = IMG.open(abbrtoimg[teamabbrlst[i]])
+#     img.thumbnail(thumbsize);
+#     newimg = ImageTk.PhotoImage(img)
+#     piclabel = tk.Label(window, image=newimg)
+#     piclabel.image = newimg
+#     if i % 2 == 0:
+#         piclabel.grid(row=21, column=math.floor(i / 2))
+#     else:
+#         piclabel.grid(row=22, column=math.floor(i / 2))
+#         gamelabel = tk.Label(window, text="04/07 5pm")
+#         # gamelabel.grid(row=20, column=math.floor(i/2))
+#         # btn = Button(window, text="View More", command=lambda: get_game_recap("BOS"));
+#         # btn.grid(row=20, column=math.floor(i/2)+1)
+
+
+# Iterate through newly created teams with schedule and record, filter by date. Add game to df of games,
+# remove OPP from newly created teams array
+
+# for i in talni():
+
+print(MLB.schedule('2024-07-19'))
 '''
 imgbos = IMG.open("mlbToday/images/BOS.png")
 
@@ -204,6 +246,6 @@ class Leaders:
 
 
 for i in range(6):
-    t = Table(window, i)
-    l = Leaders(window, i)
+    t = Table(standingsframe, i)
+    l = Leaders(standingsframe, i)
 window.mainloop();
