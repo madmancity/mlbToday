@@ -33,8 +33,6 @@ bsALW = batstat[batstat.Team.isin(teamabbrlst[10:15])].reset_index(drop=True)
 bsNLE = batstat[batstat.Team.isin(teamabbrlst[15:20])].reset_index(drop=True)
 bsNLC = batstat[batstat.Team.isin(teamabbrlst[20:25])].reset_index(drop=True)
 bsNLW = batstat[batstat.Team.isin(teamabbrlst[25:30])].reset_index(drop=True)
-print(bsALC)
-
 
 
 # leaderavg = batstat.iloc[batstat['AB'].max(), 0]
@@ -73,7 +71,7 @@ def get_game_recap(team):
 #     return newimg
 f = 0
 g = 0
-schedge = MLB.schedule('2024-07-20');
+schedge = MLB.schedule('2024-03-21');
 for d in schedge:
     if f % 8 == 0 and f != 0:
         g += 3;
@@ -93,7 +91,8 @@ for d in schedge:
         gamelabel = tk.Label(window, text=time + " | " + "SGS")
     else:
         gamelabel = tk.Label(window, text=time + " | " + (d['series_status'][:3] + " " + d['series_status'][-3::]));
-    btn = Button(window, text="More..", command=lambda: get_game_recap(d['game_id']))
+    btn = Button(window, name=str(d['game_id']), text=str(d['game_id']), command=lambda func=d['game_id']: get_game_recap(func))
+
     hscorelabel = tk.Label(window, text=d['home_score'])
     ascorelabel = tk.Label(window, text=d['away_score'])
     gamelabel.grid(row=20+g, column = f*2)
@@ -131,7 +130,8 @@ for d in schedge:
 
 # for i in talni():
 
-print(MLB.schedule('2024-07-20'))
+print(MLB.schedule('2024-03-21'))
+
 '''
 imgbos = IMG.open("mlbToday/images/BOS.png")
 
@@ -141,10 +141,6 @@ boslabel = tk.Label(window, image=newbos)
 # Title within window
 newLabel = tk.Label(window, image=photo)
 '''
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 def specdiv(x):
     return {
