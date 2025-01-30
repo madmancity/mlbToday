@@ -21,8 +21,6 @@ def gamerecap(window, game_id):
     boxscoredata = mlb.boxscore_data(game_id)
     home = get_teamabbr(boxscoredata.get('teamInfo').get('home').get('teamName'));
     away = get_teamabbr(boxscoredata.get('teamInfo').get('away').get('teamName'));
-    print(home)
-    print(away)
     homeimg = IMG.open(abbrtoimg[home])
     newhomeimg = ImageTk.PhotoImage(homeimg)
     hpiclabel = tk.Label(newwindow, image=newhomeimg, borderwidth=1, relief='ridge', justify="left")
