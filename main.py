@@ -91,7 +91,7 @@ for d in schedge:
         gamelabel = tk.Label(window, text=time + " | " + "SGS")
     else:
         gamelabel = tk.Label(window, text=time + " | " + (d['series_status'][:3] + " " + d['series_status'][-3::]));
-    btn = Button(window, name=str(d['game_id']), text=str(d['game_id']), command=lambda func=d['game_id']: get_game_recap(func))
+    btn = Button(window, name=str(d['game_id']), text=str(d['game_id']), command=lambda func=d: get_game_recap(func))
 
     hscorelabel = tk.Label(window, text=d['home_score'])
     ascorelabel = tk.Label(window, text=d['away_score'])
